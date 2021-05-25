@@ -27,15 +27,15 @@ from wbb import app
 from wbb.core.decorators.errors import capture_err
 from wbb.utils.fetch import fetch
 
-__MODULE__ = "Repo"
-__HELP__ = "/repo - To Get My Github Repository Link " "And Support Group Link"
+__MODULE__ = "Don't use"
+__HELP__ = "/repo - nothing here 🗑 " "nee ethada"
 
 
 @app.on_message(filters.command("repo") & ~filters.edited)
 @capture_err
 async def repo(_, message):
     users = await fetch(
-        "https://api.github.com/repos/thehamkercat/williambutcherbot/contributors"
+        "https://api.github.com/repos/kidiloskahyper45"
     )
     list_of_users = ""
     count = 1
@@ -45,7 +45,7 @@ async def repo(_, message):
         )
         count += 1
 
-    text = f"""[Github](https://github.com/thehamkercat/WilliamButcherBot) | [Group](t.me/PatheticProgrammers)
+    text = f"""[Github](https://github.com/kidiloskahyper45) | [Group](t.me/rosebakthan)
 ```----------------
 | Contributors |
 ----------------```
