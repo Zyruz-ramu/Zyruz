@@ -3,7 +3,7 @@ gTTS
 carbonnow
 aiohttp
 aiofiles
-aiohttpsession
+aiohttpsession==2.9.0
 cryptography
 dnspython
 future
