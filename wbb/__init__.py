@@ -90,7 +90,7 @@ print("[INFO]: INITIALIZING BOT CLIENT")
 app = Client("wbb", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 # ARQ client
 print("[INFO]: INITIALIZING ARQ")
-arq = ARQ(ARQ_API_URL, ARQ_API_KEY)
+arq = ARQ(ARQ_API_URL, ARQ_API_KEY , aiohttpsession)
 # Telegraph client
 print("[INFO]: INITIALIZING TELEGRAPH")
 telegraph = Telegraph()
