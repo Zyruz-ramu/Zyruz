@@ -1,19 +1,15 @@
 # flake8: noqa F405
 """
 MIT License
-
 Copyright (c) 2021 TheHamkerCat
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,25 +18,40 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+print("[INFO]: INITIALIZING")
 import asyncio
+import logging
 import time
 from os import path
 
 from aiohttp import ClientSession
 from motor.motor_asyncio import AsyncIOMotorClient as MongoClient
 from pyrogram import Client
-from pyromod import listen
 from Python_ARQ import ARQ
-from telegraph import Telegraph
 
-print("[INFO]: INITIALIZING")
+# Setup logging
+log_file = "error.log"
+
+with open(log_file, "w") as f:
+    f.write("PEAK OF LOG FILE")
+logging.basicConfig(
+    level=logging.ERROR,
+    format="[%(asctime)s.%(msecs)03d] %(filename)s:%(lineno)s %(levelname)s: %(message)s",
+    datefmt="%m-%d %H:%M",
+    filename=log_file,
+    filemode="w",
+)
+console = logging.StreamHandler()
+logging.getLogger("").addHandler(console)
+log = logging.getLogger()
+
 is_config = path.exists("config.py")
+
 if is_config:
     from config import *
 else:
     from sample_config import *
 
-listen = listen
 USERBOT_PREFIX = USERBOT_PREFIX
 GBAN_LOG_GROUP_ID = GBAN_LOG_GROUP_ID
 SUDOERS = SUDO_USERS_ID
@@ -68,9 +79,12 @@ async def load_sudoers():
         if user_id not in sudoers:
             sudoers.append(user_id)
             await sudoersdb.update_one(
-                {"sudo": "sudo"}, {"$set": {"sudoers": sudoers}}, upsert=True
+                {"sudo": "sudo"},
+                {"$set": {"sudoers": sudoers}},
+                upsert=True,
             )
     SUDOERS = (SUDOERS + sudoers) if sudoers else SUDOERS
+    print("[INFO]: LOADED SUDOERS")
 
 
 loop = asyncio.get_event_loop()
@@ -79,25 +93,26 @@ loop.run_until_complete(load_sudoers())
 if not HEROKU:
     print("[INFO]: INITIALIZING USERBOT CLIENT")
     app2 = Client(
-        "userbot", phone_number=PHONE_NUMBER, api_id=API_ID, api_hash=API_HASH
+        "userbot",
+        phone_number=PHONE_NUMBER,
+        api_id=API_ID,
+        api_hash=API_HASH,
     )
 else:
     print("[INFO]: INITIALIZING USERBOT CLIENT")
     app2 = Client(SESSION_STRING, api_id=API_ID, api_hash=API_HASH)
 
-# Bot client
-print("[INFO]: INITIALIZING BOT CLIENT")
-app = Client("wbb", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
-# ARQ client
-print("[INFO]: INITIALIZING ARQ")
-arq = ARQ(ARQ_API_URL, ARQ_API_KEY, aiohttpsession)
-# Telegraph client
-print("[INFO]: INITIALIZING TELEGRAPH")
-telegraph = Telegraph()
-telegraph.create_account(short_name="wbb")
 # Aiohttp Client
 print("[INFO]: INITIALZING AIOHTTP SESSION")
 aiohttpsession = ClientSession()
+# ARQ Client
+print("[INFO]: INITIALIZING ARQ CLIENT")
+arq = ARQ(ARQ_API_URL, ARQ_API_KEY, aiohttpsession)
+# Bot client
+print("[INFO]: INITIALIZING BOT CLIENT")
+app = Client(
+    "wbb", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH
+)
 
 
 BOT_ID = 0
@@ -110,11 +125,13 @@ USERBOT_NAME = ""
 USERBOT_USERNAME = ""
 USERBOT_DC_ID = 0
 USERBOT_MENTION = ""
+USERBOT_BOT_CHAT_COMMON = []
 
 
 def get_info(app, app2):
     global BOT_ID, BOT_NAME, BOT_USERNAME, BOT_DC_ID, BOT_MENTION
     global USERBOT_ID, USERBOT_NAME, USERBOT_USERNAME, USERBOT_DC_ID, USERBOT_MENTION
+    global USERBOT_BOT_CHAT_COMMON
     getme = app.get_me()
     getme2 = app2.get_me()
     BOT_ID = getme.id
@@ -138,12 +155,14 @@ def get_info(app, app2):
     USERBOT_DC_ID = getme2.dc_id
 
 
-print("[INFO]: STARTING BOT CLIENT")
+print("[INFO]: STARTING BOT CLIENT TEMPORARILY")
 app.start()
-print("[INFO]: STARTING USERBOT CLIENT")
+print("[INFO]: STARTING USERBOT CLIENT TEMPORARILY")
 app2.start()
 print("[INFO]: LOADING UB/BOT PROFILE INFO")
 get_info(app, app2)
-
+print("[INFO]: LOADED UB/BOT PROFILE INFO")
 if USERBOT_ID not in SUDOERS:
     SUDOERS.append(USERBOT_ID)
+app.stop()
+app2.stop()
